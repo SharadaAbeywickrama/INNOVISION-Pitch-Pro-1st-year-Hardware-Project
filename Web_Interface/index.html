@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PITCH PRO - Advanced Line Painting Robot Control</title>
+  <style>
+    /* Reset and Base Styles */
+    * { 
+      margin: 0; 
+      padding: 0; 
+      box-sizing: border-box; 
+    }
+    
+    body { 
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #ffffff 0%, #022956 50%, #96aead 100%);
+      min-height: 100vh;
+      color: #1a1a1a;
+      line-height: 1.6;
+      font-weight: 500;
+    }
+
+    /* Main Container */
+    .container { 
+      max-width: 1500px; 
+      margin: 0 auto; 
+      padding: 24px;
+    }
+
+    /* Header */
+    .header { 
+      background: linear-gradient(135deg, #055521 0%, #2a5298 100%);
+      color: white; 
+      padding: 40px; 
+      border-radius: 16px;
+      margin-bottom: 32px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+      border: 3px solid #0f2349;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 10px,
+        rgba(255,255,255,0.02) 10px,
+        rgba(255,255,255,0.02) 20px
+      );
+    }
+
+    .header-content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+    }
+    
+    .header h1 { 
+      font-size: 3.5rem; 
+      font-weight: 900; 
+      margin-bottom: 8px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .header .subtitle {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #ffd700;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+    
+    .header p { 
+      font-size: 1.125rem; 
+      opacity: 0.9;
+      font-weight: 400;
+    }
+
+    .team-badge {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      background: #ffd700;
+      color: #1e3c72;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+    }
+
+    /* Dashboard Grid */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .full-width {
+      grid-column: 1 / -1;
+    }
+
+    /* Card Styles */
+    .card { 
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      border: 3px solid transparent;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .card:hover { 
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+      transform: translateY(-2px);
+      border-color: #ff6b35;
+    }
+    
+    .card-header { 
+      display: flex;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 3px solid #f8f9fa;
+      position: relative;
+    }
+    
+    .card-title { 
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin: 0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .card-icon {
+      width: 32px;
+      height: 32px;
+      margin-right: 16px;
+      background: #ff6b35;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 900;
+      font-size: 1.2rem;
+    }
+
+    /* Shape Icons */
+    .shape-square { 
+      width: 20px; 
+      height: 20px; 
+      background: currentColor; 
+      border-radius: 2px; 
+    }
+    
+    .shape-rectangle { 
+      width: 24px; 
+      height: 16px; 
+      background: currentColor; 
+      border-radius: 2px; 
+    }
+    
+    .shape-circle { 
+      width: 20px; 
+      height: 20px; 
+      background: currentColor; 
+      border-radius: 50%; 
+    }
+
+    .shape-navigation { 
+      width: 0; 
+      height: 0; 
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-bottom: 16px solid currentColor;
+    }
+
+    /* Emergency Card */
+    .emergency-card {
+      border: 4px solid #dc2626;
+      background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    }
+
+    .emergency-card .card-header {
+      border-bottom-color: #dc2626;
+    }
+
+    .emergency-card .card-title {
+      color: #dc2626;
+    }
+
+    /* Paint System Card */
+    .paint-card {
+      border-left: 6px solid #0891b2;
+    }
+
+    .paint-card .card-icon {
+      background: #0891b2;
+    }
+
+    /* Navigation Card */
+    .navigation-card {
+      border-left: 6px solid #059669;
+    }
+
+    .navigation-card .card-icon {
+      background: #059669;
+    }
+
+    /* Control Card */
+    .control-card {
+      border-left: 6px solid #7c3aed;
+    }
+
+    .control-card .card-icon {
+      background: #7c3aed;
+    }
+
+    /* Status Card */
+    .status-card {
+      border-left: 6px solid #ea580c;
+    }
+
+    .status-card .card-icon {
+      background: #ea580c;
+    }
+
+    /* Button Styles */
+    .btn { 
+      padding: 14px 24px; 
+      font-size: 0.95rem; 
+      font-weight: 700; 
+      border: none; 
+      border-radius: 10px; 
+      cursor: pointer; 
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 140px;
+      margin: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border: 2px solid transparent;
+    }
+    
+    .btn:hover { 
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    }
+    
+    .btn:active { 
+      transform: translateY(0);
+    }
+
+    /* Button Variants */
+    .btn-emergency { 
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+      color: white;
+      font-size: 1.1rem;
+      padding: 20px 40px;
+      font-weight: 900;
+      min-width: 240px;
+      border: 3px solid #991b1b;
+    }
+    .btn-emergency:hover { background: linear-gradient(135deg, #b91c1c, #991b1b); }
+
+    .btn-primary { 
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: white;
+      border-color: #1e40af;
+    }
+    .btn-primary:hover { background: linear-gradient(135deg, #1d4ed8, #1e40af); }
+
+    .btn-success { 
+      background: linear-gradient(135deg, #059669, #047857);
+      color: white;
+      border-color: #065f46;
+    }
+    .btn-success:hover { background: linear-gradient(135deg, #047857, #065f46); }
+
+    .btn-warning { 
+      background: linear-gradient(135deg, #d97706, #b45309);
+      color: white;
+      border-color: #92400e;
+    }
+    .btn-warning:hover { background: linear-gradient(135deg, #b45309, #92400e); }
+
+    .btn-info { 
+      background: linear-gradient(135deg, #7c3aed, #6d28d9);
+      color: white;
+      border-color: #5b21b6;
+    }
+    .btn-info:hover { background: linear-gradient(135deg, #6d28d9, #5b21b6); }
+
+    .btn-secondary { 
+      background: linear-gradient(135deg, #6b7280, #4b5563);
+      color: white;
+      border-color: #374151;
+    }
+    .btn-secondary:hover { background: linear-gradient(135deg, #4b5563, #374151); }
+
+    .btn-orange {
+      background: linear-gradient(135deg, #ea580c, #c2410c);
+      color: white;
+      border-color: #9a3412;
+    }
+    .btn-orange:hover { background: linear-gradient(135deg, #c2410c, #9a3412); }
+
+    /* Control Groups */
+    .control-group { 
+      background: #f8fafc;
+      padding: 24px;
+      border-radius: 12px;
+      margin: 16px 0;
+      border: 2px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .control-group h4 { 
+      color: #1a1a1a;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .control-group .value { 
+      font-weight: 900;
+      color: #ff6b35;
+      font-size: 1.3rem;
+    }
+
+    /* Input Styles */
+    input[type='range'] { 
+      width: 100%;
+      height: 12px;
+      background: #e2e8f0;
+      border-radius: 6px;
+      outline: none;
+      margin: 16px 0;
+      -webkit-appearance: none;
+      border: 2px solid #cbd5e0;
+    }
+    
+    input[type='range']::-webkit-slider-thumb { 
+      -webkit-appearance: none;
+      width: 28px;
+      height: 28px;
+      background: linear-gradient(135deg, #ff6b35, #f7931e);
+      border-radius: 50%;
+      cursor: pointer;
+      border: 3px solid white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    
+    input[type='number'] { 
+      width: 90px;
+      padding: 12px 16px;
+      margin: 6px;
+      border: 3px solid #e2e8f0;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 1rem;
+      font-weight: 600;
+      background: white;
+    }
+    
+    input[type='number']:focus { 
+      border-color: #ff6b35;
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.1);
+    }
+
+    /* Status Display */
+    .status-display { 
+      background: #f1f5f9;
+      color: #1e293b;
+      padding: 24px;
+      border-radius: 12px;
+      margin: 20px 0;
+      font-family: 'Courier New', monospace;
+      border: 2px solid #cbd5e0;
+    }
+    
+    .status-info { 
+      background: white;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 12px 0;
+      font-size: 0.95rem;
+      border-left: 6px solid #ff6b35;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      font-weight: 600;
+    }
+
+    /* Navigation Controls */
+    .nav-controls {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      grid-template-rows: auto auto auto;
+      gap: 12px;
+      max-width: 320px;
+      margin: 0 auto;
+      background: #f8fafc;
+      padding: 24px;
+      border-radius: 12px;
+      border: 2px solid #e2e8f0;
+    }
+
+    .nav-controls .btn {
+      margin: 4px;
+      min-width: 80px;
+      font-size: 1.2rem;
+      font-weight: 900;
+    }
+
+    .nav-forward { grid-column: 2; grid-row: 1; }
+    .nav-left { grid-column: 1; grid-row: 2; }
+    .nav-stop { grid-column: 2; grid-row: 2; }
+    .nav-right { grid-column: 3; grid-row: 2; }
+    .nav-backward { grid-column: 2; grid-row: 3; }
+
+    /* Form Controls */
+    .form-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 16px 0;
+      flex-wrap: wrap;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    label { 
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #374151;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Radio and Checkbox */
+    input[type='radio'], 
+    input[type='checkbox'] { 
+      margin-right: 12px;
+      transform: scale(1.3);
+      accent-color: #ff6b35;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 24px;
+      margin: 16px 0;
+    }
+
+    .radio-group label {
+      display: flex;
+      align-items: center;
+      font-weight: 600;
+    }
+
+    /* Canvas Styling */
+    #pathCanvas {
+      border: 4px solid #e2e8f0;
+      background: #ffffff;
+      border-radius: 12px;
+      max-width: 100%;
+      display: block;
+      margin: 20px auto;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    /* Utility Classes */
+    .text-center { text-align: center; }
+    .mb-16 { margin-bottom: 16px; }
+    .mb-20 { margin-bottom: 20px; }
+    .mt-16 { margin-top: 16px; }
+
+    .highlight { 
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      color: #92400e;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 16px 0;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-left: 6px solid #f59e0b;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    /* Grid for controls */
+    .control-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    /* Quick Actions */
+    .quick-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    /* Shape Selection */
+    .shape-selector {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      justify-content: center;
+    }
+
+    .shape-inputs {
+      margin: 20px 0;
+      background: #f8fafc;
+      padding: 20px;
+      border-radius: 12px;
+      border: 2px solid #e2e8f0;
+    }
+
+    /* Performance Indicators */
+    .performance-bar {
+      width: 100%;
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 8px 0;
+    }
+
+    .performance-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #059669, #10b981);
+      transition: width 0.3s ease;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .container {
+        padding: 16px;
+      }
+      
+      .card {
+        padding: 24px;
+      }
+      
+      .header {
+        padding: 24px;
+      }
+      
+      .header h1 {
+        font-size: 2.5rem;
+      }
+      
+      .control-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .nav-controls {
+        max-width: 280px;
+      }
+
+      .team-badge {
+        position: relative;
+        top: auto;
+        right: auto;
+        margin-top: 16px;
+        display: inline-block;
+      }
+    }
+
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="team-badge">INNOVISION</div>
+      <div class="header-content">
+        <h1>PITCH PRO</h1>
+        <div class="subtitle">Advanced Autonomous Line Painting Robot</div>
+        
+      </div>
+    </div>
+
+    <!-- Dashboard Grid -->
+    <div class="dashboard-grid">
+      
+      <!-- Emergency Control -->
+      <div class="card emergency-card full-width">
+        <div class="card-header">
+          <div class="card-icon">!</div>
+          <h3 class="card-title">Emergency Control System</h3>
+        </div>
+        <div class="text-center">
+          <button class="btn btn-emergency pulse-animation" onclick="stopMotors()">EMERGENCY STOP</button>
+        </div>
+      </div>
+
+      <!-- Paint System Control -->
+      <div class="card paint-card">
+        <div class="card-header">
+          <div class="card-icon">P</div>
+          <h3 class="card-title">Paint System</h3>
+        </div>
+        <div class="control-grid">
+          <div class="control-group">
+            <h4>Paint Pump Control</h4>
+            <div class="quick-actions">
+              <button class="btn btn-success" onclick="startPaint()">Start Pump</button>
+              <button class="btn btn-warning" onclick="stopPaint()">Stop Pump</button>
+            </div>
+          </div>
+          <div class="control-group">
+            <h4>Paint Mixer Control</h4>
+            <div class="quick-actions">
+              <button class="btn btn-info" onclick="startMix()">Start Mixer</button>
+              <button class="btn btn-warning" onclick="stopMix()">Stop Mixer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Line Width Control -->
+      <div class="card control-card">
+        <div class="card-header">
+          <div class="card-icon">W</div>
+          <h3 class="card-title">Line Width Control</h3>
+        </div>
+        <div class="control-group">
+          <h4>Current Width: <span class="value"><span id="currentWidth">1.5</span> inches</span></h4>
+        </div>
+        <div class="form-row">
+          <label>Custom Width (1.5-4.0"):</label>
+          <input type="number" id="customWidth" value="1.5" min="1.5" max="4.0" step="0.1">
+          <button class="btn btn-info" onclick="setCustomWidth()">Apply Custom</button>
+        </div>
+        <div class="quick-actions">
+          <button class="btn btn-secondary" onclick="setPresetWidth(1.5)">1.5"</button>
+          <button class="btn btn-secondary" onclick="setPresetWidth(2.0)">2.0"</button>
+          <button class="btn btn-secondary" onclick="setPresetWidth(3.0)">3.0"</button>
+          <button class="btn btn-secondary" onclick="setPresetWidth(4.0)">4.0"</button>
+        </div>
+      </div>
+
+      <!-- Manual Navigation -->
+      <div class="card navigation-card">
+        <div class="card-header">
+          <div class="card-icon"><div class="shape-navigation"></div></div>
+          <h3 class="card-title">Manual Navigation</h3>
+        </div>
+        <div class="control-group">
+          <h4>Speed Control: <span class="value" id="manualSpeedValue">120</span></h4>
+          <input type="range" id="manualSpeedSlider" min="80" max="200" value="120" oninput="updateManualSpeed()">
+        </div>
+        <div class="nav-controls">
+          <button class="btn btn-primary nav-forward" onclick="startManual('forward')">▲</button>
+          <button class="btn btn-primary nav-left" onclick="startManual('left')">◄</button>
+          <button class="btn btn-emergency nav-stop" onclick="stopMotors()">■</button>
+          <button class="btn btn-primary nav-right" onclick="startManual('right')">►</button>
+          <button class="btn btn-primary nav-backward" onclick="startManual('backward')">▼</button>
+        </div>
+      </div>
+
+      <!-- Straight Line Control -->
+      <div class="card control-card">
+        <div class="card-header">
+          <div class="card-icon">—</div>
+          <h3 class="card-title">Straight Line Control</h3>
+        </div>
+        <div class="control-grid">
+          <div class="control-group">
+            <h4>Left Motor PWM: <span class="value" id="leftPwmValue">150</span></h4>
+            <input type="range" id="leftPwmSlider" min="50" max="255" value="150" oninput="updateLeftPwm()">
+          </div>
+          <div class="control-group">
+            <h4>Right Motor PWM: <span class="value" id="rightPwmValue">150</span></h4>
+            <input type="range" id="rightPwmSlider" min="50" max="255" value="150" oninput="updateRightPwm()">
+          </div>
+        </div>
+        <div class="quick-actions">
+          <button class="btn btn-success" onclick="goStraight()">Go Straight</button>
+          <button class="btn btn-orange" onclick="goStraightWithPaint()">Go + Paint</button>
+        </div>
+      </div>
+
+      <!-- Pulse-Based Navigation -->
+      <div class="card navigation-card">
+        <div class="card-header">
+          <div class="card-icon">⚡</div>
+          <h3 class="card-title">Pulse Navigation</h3>
+        </div>
+        <div class="form-row">
+          <label>Target Pulses:</label>
+          <input type="number" id="targetPulses" value="10" min="1" max="100">
+        </div>
+        <div class="quick-actions">
+          <button class="btn btn-success" onclick="goPulses()">Execute Pulses</button>
+          <button class="btn btn-orange" onclick="goPulsesWithPaint()">Pulses + Paint</button>
+        </div>
+      </div>
+
+      <!-- Turn Control -->
+      <div class="card navigation-card">
+        <div class="card-header">
+          <div class="card-icon">↻</div>
+          <h3 class="card-title">Turn Control</h3>
+        </div>
+        <div class="quick-actions">
+          <button class="btn btn-primary" onclick="turnLeft()">Turn Left 90°</button>
+          <button class="btn btn-primary" onclick="turnRight()">Turn Right 90°</button>
+        </div>
+      </div>
+
+      <!-- Shape Navigation -->
+      <div class="card control-card">
+        <div class="card-header">
+          <div class="card-icon"><div class="shape-square"></div></div>
+          <h3 class="card-title">Shape Navigation</h3>
+        </div>
+        <div class="shape-selector">
+          <button class="btn btn-secondary" onclick="selectShape('rectangle')" id="rectBtn">
+            <div class="shape-rectangle" style="margin-right: 8px;"></div>
+            Rectangle
+          </button>
+          <button class="btn btn-secondary" onclick="selectShape('square')" id="squareBtn">
+            <div class="shape-square" style="margin-right: 8px;"></div>
+            Square
+          </button>
+        </div>
+        
+        <div id="rectangleInputs" class="shape-inputs">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Length (pulses):</label>
+              <input type="number" id="rectLength" value="4" min="1" max="20">
+            </div>
+            <div class="form-group">
+              <label>Width (pulses):</label>
+              <input type="number" id="rectWidth" value="2" min="1" max="20">
+            </div>
+          </div>
+        </div>
+        
+        <div id="squareInputs" class="shape-inputs" style="display: none;">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Side Length (pulses):</label>
+              <input type="number" id="squareSide" value="4" min="1" max="20">
+            </div>
+          </div>
+        </div>
+        
+        <div class="radio-group">
+          <label><input type="radio" name="direction" value="clockwise" checked> Clockwise</label>
+          <label><input type="radio" name="direction" value="anticlockwise"> Counter-clockwise</label>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>Base Speed:</label>
+            <input type="number" id="rectSpeed" value="120" min="80" max="200">
+          </div>
+          <label><input type="checkbox" id="withPaint"> Enable Painting</label>
+        </div>
+        
+        <div class="text-center">
+          <button class="btn btn-success" onclick="startShape()" id="startShapeBtn">Execute Rectangle</button>
+        </div>
+      </div>
+
+      <!-- PID Settings -->
+      <div class="card control-card">
+        <div class="card-header">
+          <div class="card-icon">PID</div>
+          <h3 class="card-title">PID Control Settings</h3>
+        </div>
+        <div class="control-grid">
+          <div class="form-group">
+            <label>Proportional (Kp):</label>
+            <input type="number" id="kp" value="2.0" step="0.1" min="0" max="10">
+          </div>
+          <div class="form-group">
+            <label>Integral (Ki):</label>
+            <input type="number" id="ki" value="0.1" step="0.01" min="0" max="2">
+          </div>
+          <div class="form-group">
+            <label>Derivative (Kd):</label>
+            <input type="number" id="kd" value="0.5" step="0.1" min="0" max="5">
+          </div>
+        </div>
+        <div class="text-center mt-16">
+          <button class="btn btn-info" onclick="setPID()">Apply PID Configuration</button>
+        </div>
+      </div>
+
+      <!-- System Status -->
+      <div class="card status-card">
+        <div class="card-header">
+          <div class="card-icon">SYS</div>
+          <h3 class="card-title">System Status Monitor</h3>
+        </div>
+        <div class="status-display">
+          <div class="status-info" id="status">System Ready - Click Refresh Status</div>
+          <div class="status-info" id="paintStatus"></div>
+          <div class="status-info" id="lineWidthStatus"></div>
+          <div class="status-info" id="paintLevelStatus"></div>
+          <div class="status-info" id="turnInfo"></div>
+        </div>
+        <div class="text-center">
+          <button class="btn btn-secondary" onclick="getStatus()">Refresh Status</button>
+        </div>
+      </div>
+
+      <!-- Obstacle Detection -->
+      <div class="card status-card">
+        <div class="card-header">
+          <div class="card-icon">OBS</div>
+          <h3 class="card-title">Obstacle Detection System</h3>
+        </div>
+        <div class="status-info" id="obstacleStatus">System Active - Path Clear</div>
+        <div class="control-grid">
+          <div class="control-group">
+            <h4>Sensor 1 Distance</h4>
+            <div class="value"><span id="distance1">-- cm</span></div>
+          </div>
+          <div class="control-group">
+            <h4>Sensor 2 Distance</h4>
+            <div class="value"><span id="distance2">-- cm</span></div>
+          </div>
+          <div class="control-group">
+            <h4>Minimum Safe Distance</h4>
+            <div class="value"><span id="minDistance">-- cm</span></div>
+          </div>
+        </div>
+        <div class="highlight">
+          Detection Range: 20cm | Automatic navigation pause and resume for safety
+        </div>
+        <div class="status-info" id="navigationStatus"></div>
+      </div>
+
+      <!-- GPS Path Tracking -->
+      <div class="card navigation-card full-width">
+        <div class="card-header">
+          <div class="card-icon">GPS</div>
+          <h3 class="card-title">GPS Path Tracking System</h3>
+        </div>
+        <div class="status-info mb-16">GPS Status: <span id="gpsState">Inactive</span></div>
+        <div class="text-center">
+          <canvas id="pathCanvas" width="700" height="450"></canvas>
+        </div>
+        <div class="highlight">
+          Green Circle: Start Position | Red Circle: Current Position | Blue Line: Robot Path Trail
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    let selectedShape = 'rectangle';
+    function selectShape(shape) {
+      selectedShape = shape;
+      if (shape === 'rectangle') {
+        document.getElementById('rectangleInputs').style.display = 'block';
+        document.getElementById('squareInputs').style.display = 'none';
+        document.getElementById('startShapeBtn').innerHTML = 'Execute Rectangle';
+        document.getElementById('rectBtn').style.background = 'linear-gradient(135deg, #059669, #047857)';
+        document.getElementById('rectBtn').style.color = 'white';
+        document.getElementById('squareBtn').style.background = 'linear-gradient(135deg, #6b7280, #4b5563)';
+        document.getElementById('squareBtn').style.color = 'white';
+      } else {
+        document.getElementById('rectangleInputs').style.display = 'none';
+        document.getElementById('squareInputs').style.display = 'block';
+        document.getElementById('startShapeBtn').innerHTML = 'Execute Square';
+        document.getElementById('rectBtn').style.background = 'linear-gradient(135deg, #6b7280, #4b5563)';
+        document.getElementById('rectBtn').style.color = 'white';
+        document.getElementById('squareBtn').style.background = 'linear-gradient(135deg, #059669, #047857)';
+        document.getElementById('squareBtn').style.color = 'white';
+      }
+    }
+
+    // Paint System Functions
+    function startPaint() { fetch('/paint?action=start'); }
+    function stopPaint() { fetch('/paint?action=stop'); }
+    function startMix() { fetch('/mix?action=start'); }
+    function stopMix() { fetch('/mix?action=stop'); }
+
+    // Line Width Functions
+    function setCustomWidth() {
+      const width = parseFloat(document.getElementById('customWidth').value);
+      if (width >= 1.5 && width <= 4.0) {
+        fetch('/linewidth?width=' + width);
+        document.getElementById('currentWidth').innerHTML = width.toFixed(1);
+      } else {
+        alert('Width must be between 1.5 and 4.0 inches');
+      }
+    }
+    function setPresetWidth(width) {
+      fetch('/linewidth?width=' + width);
+      document.getElementById('currentWidth').innerHTML = width.toFixed(1);
+      document.getElementById('customWidth').value = width;
+    }
+
+    // Updated Shape Function
+    function startShape() {
+      let length, width;
+      if (selectedShape === 'square') {
+        const side = parseInt(document.getElementById('squareSide').value);
+        length = side;
+        width = side;
+      } else {
+        length = parseInt(document.getElementById('rectLength').value);
+        width = parseInt(document.getElementById('rectWidth').value);
+      }
+      const direction = document.querySelector('input[name="direction"]:checked').value;
+      const speed = parseInt(document.getElementById('rectSpeed').value);
+      const withPaint = document.getElementById('withPaint').checked;
+      fetch('/rectangle?length=' + length + '&width=' + width + '&dir=' + direction + '&speed=' + speed + '&paint=' + withPaint);
+    }
+
+    // Updated Straight Functions
+    function goStraight() {
+      const leftPwm = parseInt(document.getElementById('leftPwmSlider').value);
+      const rightPwm = parseInt(document.getElementById('rightPwmSlider').value);
+      fetch('/straight?left=' + leftPwm + '&right=' + rightPwm);
+    }
+    function goStraightWithPaint() {
+      const leftPwm = parseInt(document.getElementById('leftPwmSlider').value);
+      const rightPwm = parseInt(document.getElementById('rightPwmSlider').value);
+      fetch('/straight?left=' + leftPwm + '&right=' + rightPwm + '&paint=true');
+    }
+
+    // New Pulse Functions
+    function goPulses() {
+      const pulses = parseInt(document.getElementById('targetPulses').value);
+      fetch('/pulses?count=' + pulses);
+    }
+    function goPulsesWithPaint() {
+      const pulses = parseInt(document.getElementById('targetPulses').value);
+      fetch('/pulses?count=' + pulses + '&paint=true');
+    }
+
+    // Other existing functions
+    function updateManualSpeed() { document.getElementById('manualSpeedValue').innerHTML = document.getElementById('manualSpeedSlider').value; }
+    function updateLeftPwm() { document.getElementById('leftPwmValue').innerHTML = document.getElementById('leftPwmSlider').value; }
+    function updateRightPwm() { document.getElementById('rightPwmValue').innerHTML = document.getElementById('rightPwmSlider').value; }
+    function startManual(direction) { const speed = parseInt(document.getElementById('manualSpeedSlider').value); fetch('/manual?dir=' + direction + '&speed=' + speed); }
+    function turnLeft() { fetch('/turn?direction=left'); }
+    function turnRight() { fetch('/turn?direction=right'); }
+    function setPID() { const kp = parseFloat(document.getElementById('kp').value); const ki = parseFloat(document.getElementById('ki').value); const kd = parseFloat(document.getElementById('kd').value); fetch('/pid?kp=' + kp + '&ki=' + ki + '&kd=' + kd); }
+    function stopMotors() { fetch('/stop'); }
+    function setLED(pin) { if(pin == 0) { fetch('/led?cmd=OFF'); } else { fetch('/led?cmd=' + pin); } }
+    function getStatus() { fetch('/status').then(function(response) { return response.text(); }).then(function(data) { document.getElementById('status').innerHTML = data; updatePaintStatus(); }); }
+    function updatePaintStatus() { fetch('/status').then(function(response) { return response.text(); }).then(function(data) { if(data.includes('PAINT:ON')) { document.getElementById('paintStatus').innerHTML = 'PAINT SYSTEM: ACTIVE'; } else { document.getElementById('paintStatus').innerHTML = 'PAINT SYSTEM: OFFLINE'; } if(data.includes('MIX:ON')) { document.getElementById('paintStatus').innerHTML += ' | MIXER: ACTIVE'; } else { document.getElementById('paintStatus').innerHTML += ' | MIXER: OFFLINE'; } if(data.includes('WIDTH:')) { const widthMatch = data.match(/WIDTH:([0-9.]+)/); if(widthMatch) { document.getElementById('lineWidthStatus').innerHTML = 'LINE WIDTH: ' + widthMatch[1] + ' INCHES'; } } if(data.includes('TANK:')) { const tankMatch = data.match(/TANK:([A-Z]+)/); if(tankMatch) { let color = tankMatch[1] === 'GREEN' ? '#059669' : tankMatch[1] === 'YELLOW' ? '#d97706' : '#dc2626'; document.getElementById('paintLevelStatus').innerHTML = '<span style=\"color:' + color + '; font-weight: 900;\">TANK LEVEL: ' + tankMatch[1] + '</span>'; } } }); }
+    setInterval(getStatus, 2000); getStatus();
+
+    let pathCanvas = null;
+    let pathCtx = null;
+    let minLat = 999, maxLat = -999, minLon = 999, maxLon = -999;
+
+    function initGPSCanvas() {
+      pathCanvas = document.getElementById("pathCanvas");
+      if (pathCanvas) {
+        pathCtx = pathCanvas.getContext("2d");
+      }
+    }
+
+    function updateGPSPath() {
+      fetch("/gps").then(response => response.json()).then(data => {
+        document.getElementById("gpsState").innerHTML = data.totalPoints > 0 ? "ACTIVE (" + data.totalPoints + " points)" : "WAITING FOR GPS FIX...";
+        if (data.pathPoints && data.pathPoints.length > 0 && pathCtx) {
+          drawPath(data);
+        }
+      }).catch(err => {
+        document.getElementById("gpsState").innerHTML = "GPS ERROR";
+      });
+    }
+
+    function drawPath(data) {
+      pathCtx.clearRect(0, 0, pathCanvas.width, pathCanvas.height);
+      if (data.pathPoints.length < 2) return;
+      minLat = Math.min(...data.pathPoints.map(p => p.lat));
+      maxLat = Math.max(...data.pathPoints.map(p => p.lat));
+      minLon = Math.min(...data.pathPoints.map(p => p.lon));
+      maxLon = Math.max(...data.pathPoints.map(p => p.lon));
+      const latPadding = (maxLat - minLat) * 0.1;
+      const lonPadding = (maxLon - minLon) * 0.1;
+      minLat -= latPadding; maxLat += latPadding;
+      minLon -= lonPadding; maxLon += lonPadding;
+      pathCtx.strokeStyle = "#2563eb";
+      pathCtx.lineWidth = 3;
+      pathCtx.beginPath();
+      data.pathPoints.forEach((point, index) => {
+        const x = ((point.lon - minLon) / (maxLon - minLon)) * pathCanvas.width;
+        const y = pathCanvas.height - ((point.lat - minLat) / (maxLat - minLat)) * pathCanvas.height;
+        if (index === 0) {
+          pathCtx.moveTo(x, y);
+          pathCtx.fillStyle = "#059669";
+          pathCtx.beginPath();
+          pathCtx.arc(x, y, 8, 0, 2 * Math.PI);
+          pathCtx.fill();
+          pathCtx.strokeStyle = "#2563eb";
+          pathCtx.lineWidth = 3;
+          pathCtx.beginPath();
+          pathCtx.moveTo(x, y);
+        } else {
+          pathCtx.lineTo(x, y);
+        }
+      });
+      pathCtx.stroke();
+      if (data.pathPoints.length > 1) {
+        const lastPoint = data.pathPoints[data.pathPoints.length - 1];
+        const x = ((lastPoint.lon - minLon) / (maxLon - minLon)) * pathCanvas.width;
+        const y = pathCanvas.height - ((lastPoint.lat - minLat) / (maxLat - minLat)) * pathCanvas.height;
+        pathCtx.fillStyle = "#dc2626";
+        pathCtx.beginPath();
+        pathCtx.arc(x, y, 8, 0, 2 * Math.PI);
+        pathCtx.fill();
+      }
+    }
+
+    setTimeout(initGPSCanvas, 1000);
+    setInterval(updateGPSPath, 3000);
+
+    // Obstacle Detection JavaScript
+    function updateObstacleStatus() {
+      fetch('/obstacle').then(response => response.json()).then(data => {
+        const statusDiv = document.getElementById('obstacleStatus');
+        const navStatusDiv = document.getElementById('navigationStatus');
+        if (data.obstacleDetected) {
+          statusDiv.className = 'status-info';
+          statusDiv.style.borderLeftColor = '#dc2626';
+          statusDiv.style.background = '#fee2e2';
+          statusDiv.innerHTML = 'OBSTACLE DETECTED! Distance: ' + data.distance + ' cm - SYSTEM PAUSED';
+          navStatusDiv.innerHTML = 'NAVIGATION STATUS: PAUSED FOR SAFETY';
+          navStatusDiv.style.color = '#dc2626';
+          navStatusDiv.style.borderLeftColor = '#dc2626';
+        } else {
+          statusDiv.className = 'status-info';
+          statusDiv.style.borderLeftColor = '#059669';
+          statusDiv.style.background = '#dcfce7';
+          statusDiv.innerHTML = 'PATH CLEAR - OBSTACLE DETECTION ACTIVE';
+          if (data.navigationPaused) {
+            navStatusDiv.innerHTML = 'NAVIGATION STATUS: RESUMING OPERATIONS';
+            navStatusDiv.style.color = '#d97706';
+            navStatusDiv.style.borderLeftColor = '#d97706';
+          } else {
+            navStatusDiv.innerHTML = 'NAVIGATION STATUS: ACTIVE AND OPERATIONAL';
+            navStatusDiv.style.color = '#059669';
+            navStatusDiv.style.borderLeftColor = '#059669';
+          }
+        }
+        
+        // Update distance readings
+        if (data.distance1) document.getElementById('distance1').innerHTML = data.distance1 + ' cm';
+        if (data.distance2) document.getElementById('distance2').innerHTML = data.distance2 + ' cm';
+        if (data.minDistance) document.getElementById('minDistance').innerHTML = data.minDistance + ' cm';
+      }).catch(err => {
+        document.getElementById('obstacleStatus').innerHTML = 'SENSOR ERROR - CHECK CONNECTIONS';
+        document.getElementById('obstacleStatus').style.borderLeftColor = '#dc2626';
+        document.getElementById('obstacleStatus').style.background = '#fee2e2';
+      });
+    }
+
+    setInterval(updateObstacleStatus, 500);
+    updateObstacleStatus();
+
+    // Initialize shape selection
+    selectShape('rectangle');
+  </script>
+</body>
+</html>
